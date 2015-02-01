@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+import sys
+import matplotlib.pyplot as pp
+import datetime
+import matplotlib.dates
+
+filename=sys.argv[1]
+
+#a, b = map(int, "2342342,2234234".split(","))  
+# [[int(i) for i in line.strip().split(',')] for line in open('input.txt').readlines()]
+
+
+def load(filename,fields=[1]):
+    assert type(fields) is list
+    assrt=fields[0]+1  
+    y = [ [] ]
+    x = []
+    for fii in range(len(fields)-1):
+        y.append([])
+    i=0
+    with open(filename) as f:
+        for line in f:
+            l2 = line.strip().split(',')
+            #decode time "2015-1-01 ..."
+            dt=datetime.datetime.strptime(l2[0], '%Y-%m-%d %H:%M:%S')
+            #print "%s---%r"%(l2[0], dt,)
+            #x.append(dt.toordinal())
+            t=matplotlib.dates.date2num(dt)
+            x.append(t)
+
+            for fii in range(len(fields)):
+                fi=fields[fii]
+                y[fii].append([float(l2[fi])/1000.0])
+            #x.append([float(x) for x in l2])
+            #x.append(i)
+            #i += 1
+    return x,y
+
+#datetime.datetime.fromtimestamp(
+#        int("1284101485")
+#    ).strftime('%Y-%m-%d %H:%M:%S')
+
+def mean(x):
+   s=0
+   for a in x:
+      s+=a
+   return s/len(x)
+
+#for file(fname).read().split().
+x,y=load(filename,[1])
+#x=map(lambda a: a-mean(x),x)
+for yy in y:
+    p1=pp.plot(x,yy) #y[0])
+    p2=pp.plot(x,yy,'o') #orange circles
+
+#print repr(x)
+#print repr(y)
+
+legend_handles=[p1,]
+labels=['value',]
+#ca=['r','g','b','k','m','c','y']
+#pp.rcParams.update({'legend.fontsize': 8, 'legend.linewidth': 1})
+pp.gca().set_xlabel('time')
+pp.legend(labels)
+pp.title("%s"%(filename,) )
+pp.show()
+
+
+#timezone.utc
+#dates = matplotlib.dates.date2num(list_of_datetimes)
+
+#http://stackoverflow.com/questions/1574088/plotting-time-in-python-with-matplotlib
