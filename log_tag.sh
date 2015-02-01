@@ -1,5 +1,9 @@
-echo $1 >~/cs/thissys/temp.log
+FLDR=~/cs/thiscomputer
+cd $FLDR
+
+echo $1 >./__temp.tmp
 #assert filelength < etc
 #assert wc is 1
-wc -l ~/cs/thissys/tags.log|cut -d' ' -f1
-echo $(date --utc "+%Y-%m-%d %T"),\  $(cat ~/cs/thissys/temp.log) >>~/cs/thissys/tags.log
+echo $(wc -l ./__temp.tmp|cut -d' ' -f1) lines
+echo $(wc -l ./tags.log|cut -d' ' -f1) lines
+echo $(date --utc "+%Y-%m-%d %T"),\  $(cat __temp.tmp) >>./tags.log
