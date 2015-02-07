@@ -1,10 +1,33 @@
 #!/usr/bin/env python
-import sys
+import sys,os
 import matplotlib.pyplot as pp
 import datetime
 import matplotlib.dates
+import numpy as np
 
-filename=sys.argv[1]
+if len(sys.argv)==1:
+    sys.stdout.write("Usage:\n   %s logfile1 1.0  logfile2 10.0 ..."%(sys.argv[0]))
+    #~/cs/thiscomputer/graph1 ~/cs/thiscomputer/battery_values.log 100 ~/cs/thiscomputer/heat_values.log
+    import os
+    os.exit(-1)
+
+#filenames=sys.argv[1:]
+filenames=sys.argv[1::2]
+scales=map(lambda x:float(x), sys.argv[2::2])
+
+print type(filenames),type(scales)
+print len(filenames),len(scales)
+
+
+for filename,scale in zip(filenames,scales):
+    print type(filename),type(scale)
+print scales
+if len(scales)==len(filenames)-1:
+    print "***"
+    scales += [1.0]
+
+print zip(filenames,scales)
+assert len(filenames)==len(scales)
 
 #a, b = map(int, "2342342,2234234".split(","))  
 # [[int(i) for i in line.strip().split(',')] for line in open('input.txt').readlines()]
@@ -46,22 +69,25 @@ def mean(x):
       s+=a
    return s/len(x)
 
-#for file(fname).read().split().
-x,y=load(filename,[1])
-#x=map(lambda a: a-mean(x),x)
-for yy in y:
-    p1=pp.plot(x,yy) #y[0])
-    p2=pp.plot(x,yy,'o') #orange circles
+legend_handles=[]
+labels=[]
 
-#print repr(x)
-#print repr(y)
+for filename,scale in zip(filenames,scales):
+    print type(filename),type(scale)
+    #for file(fname).read().split().
+    x,y=load(filename,[1])
+    #x=map(lambda a: a-mean(x),x)
+    for yy in y:
+        p1=pp.plot(x,np.array(yy)/scale, label=os.path.split(filename)[1])   #y[0])
+        p2=pp.plot(x,np.array(yy)/scale,'o') #orange circles
 
-legend_handles=[p1,]
-labels=['value',]
+    legend_handles+=[p1,]
+    labels+=[filename,]
 #ca=['r','g','b','k','m','c','y']
 #pp.rcParams.update({'legend.fontsize': 8, 'legend.linewidth': 1})
 pp.gca().set_xlabel('time')
-pp.legend(labels)
+#pp.legend(tuple(legend_handles),tuple(labels))
+pp.legend() #legend_handles)
 pp.title("%s"%(filename,) )
 pp.show()
 
