@@ -6,13 +6,24 @@ import matplotlib.dates
 import numpy as np
 
 if len(sys.argv)==1:
-    sys.stdout.write("Usage:\n   %s logfile1 1.0  logfile2 10.0 ..."%(sys.argv[0]))
+    sys.stdout.write("Usage:\n   %s --th 24 logfile1 1.0  logfile2 10.0 ... "%(sys.argv[0]))
     #~/cs/thiscomputer/graph1 ~/cs/thiscomputer/battery_values.log 100 ~/cs/thiscomputer/heat_values.log
     import os
     os.exit(-1)
 
+#the number value of time
+time_zero = matplotlib.dates.date2num(datetime.datetime.now())
+
+
+c=1
+if sys.argv[c]=='--th': #time in hours
+    time_history_depth_sec = float(sys.argv[c+1])*60*60
+    c+=2
+else:
+    time_history_depth_sec = None
+
 #filenames=sys.argv[1:]
-filenames=sys.argv[1::2]
+filenames=sys.argv[c::2]
 scales=map(lambda x:float(x), sys.argv[2::2])
 
 print type(filenames),type(scales)
@@ -48,7 +59,7 @@ def load(filename,fields=[1]):
             dt=datetime.datetime.strptime(l2[0], '%Y-%m-%d %H:%M:%S')
             #print "%s---%r"%(l2[0], dt,)
             #x.append(dt.toordinal())
-            t=matplotlib.dates.date2num(dt)
+            t=matplotlib.dates.date2num(dt) - time_zero
             x.append(t)
 
             for fii in range(len(fields)):
@@ -85,7 +96,13 @@ for filename,scale in zip(filenames,scales):
     labels+=[filename,]
 #ca=['r','g','b','k','m','c','y']
 #pp.rcParams.update({'legend.fontsize': 8, 'legend.linewidth': 1})
-pp.gca().set_xlabel('time')
+pp.gca().set_xlabel('Time [days]')
+
+if not time_history_depth_sec is None:
+    dt=datetime.datetime.now()
+    t=matplotlib.dates.date2num(dt) - time_zero
+    pp.xlim((t-time_history_depth_sec/(24*60*60),t))
+
 #pp.legend(tuple(legend_handles),tuple(labels))
 pp.legend() #legend_handles)
 pp.title("%s"%(filename,) )
@@ -93,6 +110,6 @@ pp.show()
 
 
 #timezone.utc
-#dates = matplotlib.dates.date2num(list_of_datetimes)
+#dates = matplotlib.dates.date2num(list_of_datetimes) - time_zero
 
 #http://stackoverflow.com/questions/1574088/plotting-time-in-python-with-matplotlib
